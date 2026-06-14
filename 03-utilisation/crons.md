@@ -7,8 +7,9 @@ Hermes Agent peut exécuter des actions automatiquement selon un planning. C'est
 ```
 Cron = tâche planifiée qui s'exécute automatiquement
      │
-     ├── Script pur (no_agent) → Aucun LLM, exécution directe ✅
-     └── LLM-driven → L'assistant réfléchit puis agit 🧠
+     ├── Script pur (no_agent) → Aucun LLM, exécution directe 0$ ✅
+     ├── LLM sur Ollama local  → Gratuit (votre machine)
+     └── LLM sur provider payant → Coût par exécution 💰
 ```
 
 ## Types de crons
@@ -17,7 +18,7 @@ Cron = tâche planifiée qui s'exécute automatiquement
 
 Pour les tâches purement techniques : collecte de données, backup, déploiement.
 
-**Avantage :** zéro token LLM consommé, exécution rapide.
+**Avantage :** zéro token LLM consommé, exécution rapide, **0$** à vie.
 
 ```bash
 # Créer un cron no_agent
@@ -29,26 +30,62 @@ hermes cron create --script mon-script.sh --schedule "0 6 * * *" --name "mon-bac
 - Exit code 0 = succès, non-zero = échec
 - Le script a accès à `stdout` qui est livré à l'utilisateur
 
-### LLM-driven
+### LLM sur Ollama (local, gratuit)
 
-Pour les tâches qui nécessitent de la réflexion : analyse, résumé, rédaction.
+Pour les tâches qui nécessitent de la réflexion, sans coût :
 
 ```bash
-# Créer un cron LLM
-hermes cron create --prompt "Analyse les logs et résume les erreurs" --schedule "0 9 * * 1" --name "rapport-hebdo"
+hermes cron create \
+  --prompt "Analyse les logs et résume les erreurs" \
+  --schedule "0 9 * * 1" --name "rapport-hebdo" \
+  --model "qwen2.5:7b" --provider "custom:ollama"
 ```
 
-**Conseil :** Pour les crons LLM, utilisez de préférence un LLM local gratuit (Ollama) plutôt qu'un provider payant à chaque exécution.
+### LLM sur provider payant
+
+À éviter pour les crons récurrents. Si vraiment nécessaire, privilégiez une
+fréquence faible (hebdomadaire, pas horaire).
+
+## Planification efficace
+
+### Ordre de grandeur des coûts
+
+| Type de cron | Coût par run | Coût / mois (horaire) |
+|-------------|-------------|----------------------|
+| no_agent (script) | **0$** | **0$** |
+| Ollama local | **0$** | **0$** |
+| DeepSeek / Gemini | ~0.001-0.01$ | ~7-70$ |
+
+**Règle LEO :** Tout cron récurrent (toutes les heures/jours) doit être `no_agent`
+ou tourner sur Ollama. DeepSeek est réservé aux interactions directes.
+
+### Ordonnancement décalé (staggered)
+
+Quand plusieurs crons tournent à la même fréquence, décalez les minutes pour
+éviter l'embouteillage :
+
+```
+H:00 → machines-kpi   (collecte métriques)
+H:05 → budget-check   (solde API)
+H:10 → dashboard-KPI  (génération HTML)
+H:15 → dashboard-machines
+H:20 → monitoring-crons
+```
+
+Chaque cron a `~5 min` de fenêtre exclusive.
 
 ## Configuration d'un cron
 
 ### Syntaxe de planification
 
-| Expression | Signification | Exemple |
-|------------|--------------|---------|
+| Expression | Signification | Usage |
+|------------|--------------|-------|
+| `0 * * * *` | Toutes les heures à :00 | Collecte métriques |
+| `5 * * * *` | Toutes les heures à :05 | Budget |
+| `10 * * * *` | Toutes les heures à :10 | Dashboard KPI |
 | `0 6 * * *` | Tous les jours à 06:00 | Backup quotidien |
-| `0 */4 * * *` | Toutes les 4h | Dashboard |
 | `0 8 * * 1` | Tous les lundis à 08:00 | Rapport hebdo |
+| `0 18 * * *` | Tous les jours à 18:00 | Sync externe |
 | `30m` | Toutes les 30 minutes | Monitoring rapide |
 
 ### Exemple concret : backup quotidien
@@ -61,15 +98,14 @@ hermes cron create \
   --no-agent
 ```
 
-### Exemple concret : rapport budget
+### Exemple concret : dashboard horaire
 
 ```bash
 hermes cron create \
-  --prompt "Vérifie le solde DeepSeek et enregistre le relevé" \
-  --schedule "0 7 * * *" \
-  --name "budget-check" \
-  --model "qwen2.5:7b" \
-  --provider "custom:ollama"
+  --script run-dashboard.sh \
+  --schedule "10 * * * *" \
+  --name "dashboard-deploy" \
+  --no-agent
 ```
 
 ## Gestion des crons
@@ -108,30 +144,66 @@ Ces informations sont consultables :
 cat ~/.hermes/cron/output/<id>/*.md
 ```
 
-**Astuce LEO :** Créez un **dashboard de monitoring** des crons (voir `03-utilisation/dashboards.md`) pour avoir un œil sur l'état de tous vos crons en un coup d'œil.
+**Astuce LEO :** Créez un **dashboard de monitoring** des crons (voir
+`03-utilisation/dashboards.md`) pour avoir un œil sur l'état de tous vos crons
+en un coup d'œil. Ce dashboard peut lui-même être mis à jour par un cron
+horaire.
 
 ## Pièges à éviter
 
 ### 🔴 Ne pas mettre de LLM sur une tâche purement script
 
-Un cron de collecte de métriques (Python pur) **n'a pas besoin** d'un LLM. Le LLM dirait juste "j'ai exécuté le script, voici le résultat" — gaspillage de tokens.
+Un cron de collecte de métriques (Python pur) **n'a pas besoin** d'un LLM.
+Le LLM dirait juste "j'ai exécuté le script, voici le résultat" — gaspillage
+de tokens et d'argent.
 
-### 🔴 Gérer l'identité Git pour les push
+### 🔴 Gérer l'identité et le token Git
 
-Si votre cron push sur GitHub, configurez l'identité explicitement dans le script :
+Si votre cron push sur GitHub, l'environnement cron peut ne pas avoir accès
+aux credentials GitHub. Deux solutions :
 
+**Solution 1 — Chemin absolu vers gh :**
 ```python
-subprocess.run(["git", "config", "user.name", "MonAssistant"])
-subprocess.run(["git", "config", "user.email", "assistant@exemple.com"])
+import subprocess, os
+gh_path = "/opt/data/home/.local/bin/gh"
+tok = os.environ.get("GH_TOKEN")
+if not tok:
+    tok = subprocess.run([gh_path, "auth", "token"],
+        capture_output=True, text=True).stdout.strip()
+remote = f"https://user:{tok}@github.com/user/repo.git"
+subprocess.run(["git", "remote", "set-url", "origin", remote])
+subprocess.run(["git", "push", "origin", "main"])
 ```
+
+**Solution 2 — Variable d'environnement :**
+Définir `GH_TOKEN` dans le script ou l'environnement du cron.
 
 ### 🔴 Attention aux chemins dans l'environnement cron
 
-L'environnement d'exécution d'un cron no_agent est minimal. Utilisez des **chemins absolus** dans vos scripts.
+L'environnement d'exécution d'un cron no_agent est minimal. Utilisez des
+**chemins absolus** dans vos scripts. Exemple : `/opt/hermes/.venv/bin/python3`
+plutôt que `python3`.
+
+### 🔴 Cross-device move
+
+Dans un script cron, ne pas utiliser `Path.rename()` entre `/tmp/` et
+`/opt/data/` — ces répertoires sont souvent sur des filesystems différents.
+Utilisez `shutil.move()`.
+
+```python
+# ❌ Ne fait pas
+tmp.rename(local_path)
+
+# ✅ Fait
+import shutil
+shutil.move(str(tmp), str(local_path))
+```
 
 ### 🔴 Vérifier les sorties
 
-Un cron no_agent qui exit 0 mais ne fait rien est silencieux. Pour les tâches critiques, faites en sorte qu'il produise une sortie utile pour confirmer que le travail a été fait.
+Un cron no_agent qui exit 0 mais ne fait rien est silencieux. Pour les
+tâches critiques, faites en sorte qu'il produise une sortie utile pour
+confirmer que le travail a été fait.
 
 ## Pour aller plus loin
 

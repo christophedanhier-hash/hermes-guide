@@ -26,27 +26,31 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 
 ## Tâches quotidiennes
 
-### Crons (7 actifs)
+### Crons (8 actifs, 0$ LLM)
 
-| Cron | Horaire | Type | Description |
-|------|---------|------|-------------|
-| `daily-backup` | 06:00 | 🔧 Script | Backup fichiers critiques vers Google Drive |
-| `docs-update` | Lun 08:00 | 🧠 Ollama | Mise à jour docs techniques du T600 |
-| `machines-kpi` | 07:00 | 🔧 Script | Collecte CPU/RAM/disque 3 machines |
-| `budget-check-v6` | 07:00 | 🔧 Script | Relevé solde DeepSeek + projection |
-| `dashboard-deploy` | T/4h | 🔧 Script | Génération et push dashboard Hermes KPI |
-| `leo-metrics` | T/4h | 🔧 Script | Génération et push dashboard 3 machines |
-| `crons-dashboard` | T/4h | 🔧 Script | Monitoring de tous les crons |
+| Cron | Horaire | Type | Coût | Description |
+|------|---------|------|------|-------------|
+| `machines-kpi` | **H:00** | 🔧 Script | **0$** | Collecte CPU/RAM/disque 3 machines |
+| `budget-check-v6` | **H:05** | 🔧 Script | **0$** | Relevé solde DeepSeek + projection |
+| `dashboard-deploy` | **H:10** | 🔧 Script | **0$** | Génération et push dashboard Hermes KPI |
+| `leo-metrics` | **H:15** | 🔧 Script | **0$** | Génération et push dashboard 3 machines |
+| `crons-dashboard` | **H:20** | 🔧 Script | **0$** | Monitoring de tous les crons |
+| `daily-backup` | 06:00 | 🔧 Script | **0$** | Backup fichiers critiques vers Google Drive |
+| `drive-sync` | 18:00 | 🔧 Script | **0$** | Synchronisation Drive → GitHub |
+| `docs-update` | Lun 08:00 | 🧠 Ollama | **0$** 🏠 | Mise à jour docs techniques du T600 |
 
-**100% des crons sont en no_agent** (zéro token DeepSeek gaspillé).
+**100% des crons sont en no_agent ou Ollama local** (zéro DeepSeek consommé par les tâches planifiées).
 
-### Dashboards (3)
+### Dashboards (6)
 
-| Dashboard | Technologie | Lien |
-|-----------|-------------|------|
-| Hermes KPI | HTML + Chart.js | [Lien](https://christophedanhier-hash.github.io/dashboard-leo/) |
-| 3 Machines | HTML + CSS | [Lien](https://christophedanhier-hash.github.io/leo-metrics/) |
-| Crons LEO | HTML + CSS pur | [Lien](https://christophedanhier-hash.github.io/crons-dashboard/) |
+| Dashboard | Technologie | Màj | Lien |
+|-----------|-------------|-----|------|
+| Hermes KPI (budget DeepSeek) | HTML + Chart.js | H:10 | [dashboard-leo](https://christophedanhier-hash.github.io/dashboard-leo/) |
+| 3 Machines (CPU/RAM/disque) | HTML + CSS | H:15 | [leo-metrics](https://christophedanhier-hash.github.io/leo-metrics/) |
+| Crons LEO (monitoring 8 crons) | HTML + CSS pur | H:20 | [crons-dashboard](https://christophedanhier-hash.github.io/crons-dashboard/) |
+| Suivi Budget APIs Léo | Google Sheets | H:00/H:05 | Drive LEO |
+| Suivi Machines LEO | Google Sheets | H:00 | Drive LEO |
+| Dashboard Guide Hermes | Google Docs | Manuel | Drive LEO → GitHub |
 
 ## Règles de fonctionnement
 
