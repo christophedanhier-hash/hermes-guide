@@ -35,6 +35,7 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 | `dashboard-deploy` | **H:10** | 🔧 Script | **0$** | Génération et push dashboard Hermes KPI |
 | `leo-metrics` | **H:15** | 🔧 Script | **0$** | Génération et push dashboard 3 machines |
 | `crons-dashboard` | **H:20** | 🔧 Script | **0$** | Monitoring de tous les crons |
+| `github-dashboard` | **H:25** | 🔧 Script | **0$** | Activité GitHub (repos Hermes vs Dev) |
 | `daily-backup` | 06:00 | 🔧 Script | **0$** | Backup fichiers critiques vers Google Drive |
 | `drive-sync` | 18:00 | 🔧 Script | **0$** | Synchronisation Drive → GitHub |
 | `docs-update` | Lun 08:00 | 🧠 Ollama | **0$** 🏠 | Mise à jour docs techniques du T600 |
