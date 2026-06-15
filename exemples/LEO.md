@@ -38,7 +38,7 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 | `github-dashboard` | **H:25** | 🔧 Script | **0$** | Activité GitHub (repos Hermes vs Dev) |
 | `wiki-sync` | **H:30** | 🔧 Script | **0$** | Synchronisation sources → Wiki MkDocs |
 | `daily-backup` | 06:00 | 🔧 Script | **0$** | Backup fichiers critiques vers Google Drive |
-| `drive-sync` | 18:00 | 🔧 Script | **0$** | Synchronisation Drive → GitHub |
+| `drive-sync` | 18:00 | 🔧 Script | **0$** | Sync Drive ↔ GitHub (bidirectionnel complet) |
 | `docs-update` | Lun 08:00 | 🧠 Ollama | **0$** 🏠 | Mise à jour docs techniques du T600 |
 
 **100% des crons sont en no_agent ou Ollama local** (zéro DeepSeek consommé par les tâches planifiées).

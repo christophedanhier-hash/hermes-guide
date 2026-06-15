@@ -24,7 +24,7 @@ LEO a **5 dashboards** en production, tous rafraîchis toutes les heures :
 | **3 Machines** | CPU, RAM, disque LEO/Yoga/Penguin | [leo-metrics](https://christophedanhier-hash.github.io/leo-metrics/) | H:15 |
 | **Crons LEO** | État de tous les crons, historique 7j | [crons-dashboard](https://christophedanhier-hash.github.io/crons-dashboard/) | H:20 |
 | **Backup** | Dernier backup, fichiers préservés | Google Drive | 06:00 |
-| **Drive Sync** | Dernière sync Drive → GitHub | GitHub | 18:00 |
+| **Drive Sync** | Dernière sync Drive ↔ GitHub bidirectionnelle | GitHub | 18:00 |
 
 Tous sont générés par des scripts `no_agent` — **0$ de coût LLM** par mise à jour.
 
