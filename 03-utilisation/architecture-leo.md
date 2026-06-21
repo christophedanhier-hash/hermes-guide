@@ -202,57 +202,81 @@ n8n tourne sur `100.92.102.28:5678` (même machine que Hermes). Il offre **retry
 
 ### 5.1 Budget (le flux le plus critique)
 
-```
-DeepSeek API
-    │
-    ├──► Cron Hermes (H:05) ──► budget.json + Google Sheets
-    │
-    └──► n8n (H:05, retry 3x) ──► Webhook port 9199 ──► budget.json
-                                                              │
-                                ┌─────────────────────────────┤
-                                │                             │
-                     ┌──────────▼──────────┐       ┌──────────▼──────────┐
-                     │  📊 LEO KPI         │       │  🏛️ BAVI LEO        │
-                     │  dashboard          │       │  dashboard          │
-                     └─────────────────────┘       └─────────────────────┘
-                                │                             │
-                                └──────────┬──────────────────┘
-                                           ▼
-                               🛡️ Dashboard Watch
-                               (vérifie cohérence < 1$)
+```mermaid
+flowchart LR
+    DS[DeepSeek API]
+    HERMES[Cron Hermes<br/>H:05]
+    N8N[💰 n8n Budget Check<br/>H:05 · retry 3x]
+    BJ[(budget.json)]
+    GS[(Google Sheets)]
+    WH[Webhook<br/>port 9199]
+    L[Dashboard LEO KPI]
+    B[Dashboard BAVI LEO]
+    DW[dashboard-watch<br/>vérifie < 1$]
+
+    DS -->|appel direct| HERMES
+    DS -->|appel retry 3x| N8N
+    HERMES --> BJ
+    HERMES --> GS
+    N8N -->|POST| WH
+    WH --> BJ
+    BJ --> L
+    BJ --> B
+    L -->|vérifie cohérence| DW
+    B -->|vérifie cohérence| DW
+    BJ -->|budget attendu| DW
 ```
 
 ### 5.2 Dashboard Watch (vérification complète)
 
-```
-                        ┌──► 📊 LEO ──► Vérifier budget LEO ──┐
-                        │                                       │
-                        ├──► 🏛️ BAVI ──► Vérifier budget BAVI ─┤
-                        │                                       │
-n8n ──► toutes les ─────┼──► ⏱️ Crons ──► HTTP 200?            ├──► OK ?
-      30min, retry 3x   │                                       │
-                        ├──► 🐙 GitHub ──► HTTP 200?            │
-                        │                                       │
-                        ├──► 🔧 n8n ──► HTTP 200?               │
-                        │                                       │
-                        └──► 💻 Machines ──► HTTP 200? ─────────┘
+```mermaid
+flowchart TB
+    subgraph n8n_check["n8n — 30min · retry 3x"]
+        direction LR
+        N1[LEO] -->|vérifie budget| N1B[OK?]
+        N2[BAVI LEO] -->|vérifie budget| N2B[OK?]
+        N3[Crons] -->|HTTP 200?| N3B[OK?]
+        N4[GitHub] -->|HTTP 200?| N4B[OK?]
+        N5[n8n] -->|HTTP 200?| N5B[OK?]
+        N6[Machines] -->|HTTP 200?| N6B[OK?]
+    end
 
-Hermes ──► toutes les ──► Vérifie 6 dashboards + budget.json
-          2h, alerte TG    → si stale/err → redéploie + notifie
+    subgraph hermes_check["Hermes — 2h · alerte Telegram"]
+        H_ALL["Vérifie 6 dashboards<br/>+ budget.json"]
+        H_STALE{"stale ou erreur?"}
+        H_DEPLOY["Redéploie"]
+        H_TG["🚨 Alerte Telegram"]
+        H_OK["✅ Silence"]
+    end
+
+    H_ALL --> H_STALE
+    H_STALE -->|oui| H_DEPLOY
+    H_STALE -->|non| H_OK
+    H_DEPLOY --> H_TG
 ```
 
 ### 5.3 Sauvegarde & Documentation
 
-```
-doc-watch-auto ──► 00/06/12/18 ──► snapshot 5 wikis
-    │                                  │
-    └── compare → diff → patch auto ──► commit + push
-                                        │
-                                        └──► hermes-guide toujours à jour
+```mermaid
+flowchart LR
+    subgraph doc["doc-watch-auto — 6h"]
+        SNAPSHOT["Snapshot 5 wikis"]
+        COMPARE["Compare"]
+        DIFF{"Changement?"}
+        PATCH["Patch auto"]
+        COMMIT["Commit + push"]
+    end
 
-daily-backup ──► 06:00 ──► tar + compression
-    │
-    └──► /opt/data/backups/
+    subgraph backup["daily-backup — 06:00"]
+        TAR["tar + compression"]
+        STORE["/opt/data/backups/"]
+    end
+
+    SNAPSHOT --> COMPARE --> DIFF
+    DIFF -->|oui| PATCH --> COMMIT
+    DIFF -->|non| SKIP["✅ Silencieux"]
+
+    backup --> TAR --> STORE
 ```
 
 ---
@@ -271,16 +295,19 @@ daily-backup ──► 06:00 ──► tar + compression
 
 ---
 
-## 7. Schéma navigation dashboards
+## 7. Barre de navigation dashboards
 
-```
-Tous les dashboards partagent la même barre de navigation :
+Tous les dashboards partagent la même barre de navigation. Le dashboard actif est surligné.
 
-┌─────────────────────────────────────────────────────────────┐
-│ 🏛️ BAVI LEO  📊 Dashboard LEO  💻 Machines  ⏱️ Crons  🐙 GitHub  🔧 n8n │
-└─────────────────────────────────────────────────────────────┘
-
-Le dashboard actif est surligné (classe .active).
+```mermaid
+flowchart LR
+    A["🏛️ BAVI LEO"]
+    B["📊 Dashboard LEO"]
+    C["💻 Machines"]
+    D["⏱️ Crons"]
+    E["🐙 GitHub"]
+    F["🔧 n8n"]
+    A -.-> B -.-> C -.-> D -.-> E -.-> F
 ```
 
 ---
@@ -289,24 +316,24 @@ Le dashboard actif est surligné (classe .active).
 
 Prenons l'exemple d'une **session de chat** sur Telegram :
 
-```
-1. 💬 Utilisateur envoie "Quel est mon budget ?"
-       │
-2. 🦁 Hermes / DeepSeek répond (consomme tokens)
-       │
-3. 📝 Session enregistrée dans [LEO sessions DB]
-       │
-4. ⏰ H:10 ──► deploy_leo_dashboard.py lit les sessions + budget.json
-       │         │
-       │         ├── Calcule : tokens, coûts, tendances
-       │         ├── Génère index.html avec Chart.js
-       │         └── Push sur GitHub Pages + rebuild CDN
-       │
-5. 📊 Le dashboard LEO KPI est à jour (H:10, H:15, H:20...)
-       │
-6. 🛡️ n8n (30min) + Hermes (2h) vérifient que tout est OK
-       │
-7. 🚨 Si problème → alerte Telegram
+```mermaid
+flowchart TB
+    U["💬 Utilisateur<br/>'Quel est mon budget ?'"]
+    H["🦁 Hermes / DeepSeek<br/>répond + consomme tokens"]
+    S[("📝 Sessions DB")]
+    SCRIPT["deploy_leo_dashboard.py<br/>lit sessions + budget.json"]
+    HTML["Génère index.html<br/>+ Chart.js"]
+    GP["Push GitHub Pages<br/>+ rebuild CDN"]
+    DASH["📊 LEO KPI<br/>à jour"]
+    WATCH["🛡️ n8n (30min) + Hermes (2h)<br/>vérifient OK"]
+    ALERT["🚨 Alerte Telegram<br/>si problème"]
+
+    U --> H --> S
+    S -->|H:10| SCRIPT
+    SCRIPT -->|calcule tokens/coûts| HTML
+    HTML --> GP --> DASH
+    DASH --> WATCH
+    WATCH --> ALERT
 ```
 
 ---
