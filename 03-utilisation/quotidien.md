@@ -19,13 +19,14 @@ Une fois le gateway Telegram lancé, ouvrez votre bot et commencez à parler :
 ### Depuis le terminal
 
 ```bash
-hermes run
+hermes
+# ou : hermes chat
 ```
 
 Ou en mode one-shot :
 
 ```bash
-hermes run -m "Résume ce fichier"
+hermes chat -q "Résume ce fichier"
 ```
 
 ## Tâches courantes

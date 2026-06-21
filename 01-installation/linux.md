@@ -4,25 +4,27 @@
 
 - Un serveur ou PC sous **Debian 12+** ou **Ubuntu 22.04+**
 - **Python 3.11+**
-- **Git**
 - **Curl**
 - Un compte GitHub
 - (Optionnel) Un GPU NVIDIA pour exécuter des LLM locaux
 
-## 2. Installer les dépendances
+## 2. Installer Hermes Agent (méthode officielle)
 
 ```bash
-# Mise à jour des paquets
-sudo apt update && sudo apt upgrade -y
-
-# Dépendances Python
-sudo apt install -y python3 python3-venv python3-pip git curl
-
-# (Optionnel) Pour Ollama local
-curl -fsSL https://ollama.com/install.sh | sh
+# Méthode recommandée — script d'installation automatique
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
-## 3. Installer Hermes Agent
+Ce script :
+- Détecte votre OS et architecture
+- Installe les dépendances système nécessaires
+- Télécharge la dernière version d'Hermes
+- Crée un environnement virtuel isolé
+- Vous guide dans la configuration initiale
+
+### Installation manuelle (alternative)
+
+Si vous préférez une installation manuelle ou que le script ne fonctionne pas :
 
 ```bash
 # Cloner le dépôt
@@ -37,10 +39,10 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-## 4. Configurer Hermes
+## 3. Configurer Hermes
 
 ```bash
-# Initialiser la configuration
+# Assistant de configuration interactif
 hermes setup
 
 # Vérifier que tout est OK
@@ -48,17 +50,17 @@ hermes doctor
 ```
 
 Le wizard de configuration vous guidera pour :
-- Choisir votre fournisseur LLM principal
+- Choisir votre fournisseur LLM principal (`hermes model`)
 - Configurer votre profil Telegram (optionnel)
 - Créer votre profil par défaut
 
-## 5. Connecter un LLM
+## 4. Connecter un LLM
 
 ### Avec DeepSeek (recommandé pour débuter)
 
 ```bash
-# Ajouter votre clé DeepSeek
-hermes config set DEEPSEEK_API_KEY "sk-votre-cle-ici"
+# Ajouter votre clé DeepSeek dans .env
+echo "DEEPSEEK_API_KEY=votre_clé_ici" >> ~/.hermes/.env
 
 # Configurer le provider DeepSeek
 hermes config set model.default deepseek-chat
@@ -72,25 +74,39 @@ hermes config set model.provider deepseek
 ollama pull qwen2.5:7b
 
 # Configurer Hermes pour utiliser Ollama
-hermes config set providers.custom.ollama.base_url "http://localhost:11434/v1"
-hermes config set providers.custom.ollama.api_key "ollama"
+hermes config set model.default qwen2.5:7b
+hermes config set model.provider ollama
+hermes config set model.base_url "http://localhost:11434/v1"
 ```
 
-## 6. Lancer Hermes
+## 5. Lancer Hermes
 
 ```bash
 # En mode interactif (terminal)
-hermes run
+hermes
+# ou : hermes chat
+
+# En mode one-shot (requête unique)
+hermes chat -q "Dis bonjour, je suis ton nouvel assistant"
 
 # Avec Telegram (après configuration du bot)
+hermes gateway run
+# ou en service :
+hermes gateway install
 hermes gateway start
 ```
 
-## 7. Vérifier l'installation
+## 6. Vérifier l'installation
 
 ```bash
 # Test simple
-hermes run -m "Dis bonjour, je suis ton nouvel assistant"
+hermes chat -q "Dis bonjour, je suis ton nouvel assistant"
+
+# Diagnostiquer les problèmes
+hermes doctor --fix
+
+# Voir l'état des composants
+hermes status
 ```
 
 ## Problèmes courants

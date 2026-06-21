@@ -22,7 +22,7 @@ Pour les tâches purement techniques : collecte de données, backup, déploiemen
 
 ```bash
 # Créer un cron no_agent
-hermes cron create --script mon-script.sh --schedule "0 6 * * *" --name "mon-backup"
+hermes cron create "0 6 * * *" "Backup quotidien" --script mon-script.sh
 ```
 
 **Bonnes pratiques :**
@@ -35,10 +35,7 @@ hermes cron create --script mon-script.sh --schedule "0 6 * * *" --name "mon-bac
 Pour les tâches qui nécessitent de la réflexion, sans coût :
 
 ```bash
-hermes cron create \
-  --prompt "Analyse les logs et résume les erreurs" \
-  --schedule "0 9 * * 1" --name "rapport-hebdo" \
-  --model "qwen2.5:7b" --provider "custom:ollama"
+hermes cron create "0 9 * * 1" "Analyse les logs et résume les erreurs" --name "rapport-hebdo" --model qwen2.5:7b
 ```
 
 ### LLM sur provider payant
@@ -91,21 +88,13 @@ Chaque cron a `~5 min` de fenêtre exclusive.
 ### Exemple concret : backup quotidien
 
 ```bash
-hermes cron create \
-  --script run-backup.sh \
-  --schedule "0 6 * * *" \
-  --name "daily-backup" \
-  --no-agent
+hermes cron create "0 6 * * *" "Backup quotidien" --script run-backup.sh
 ```
 
 ### Exemple concret : dashboard horaire
 
 ```bash
-hermes cron create \
-  --script run-dashboard.sh \
-  --schedule "10 * * * *" \
-  --name "dashboard-deploy" \
-  --no-agent
+hermes cron create "10 * * * *" "Générer le dashboard" --script run-dashboard.sh
 ```
 
 ## Gestion des crons
@@ -114,8 +103,8 @@ hermes cron create \
 # Lister les crons
 hermes cron list
 
-# Voir le détail d'un cron
-hermes cron show <id>
+# Modifier un cron
+hermes cron edit <id> --schedule "every 4h"
 
 # Mettre en pause
 hermes cron pause <id>
@@ -128,6 +117,9 @@ hermes cron remove <id>
 
 # Forcer l'exécution immédiate
 hermes cron run <id>
+
+# Voir le statut du scheduler
+hermes cron status
 ```
 
 ## Surveillance

@@ -26,10 +26,12 @@ DeepSeek offre un excellent rapport qualité/prix avec son API.
 ### 2. Configurer
 
 ```bash
+# Dans votre .env (recommandé pour les clés API)
+echo "DEEPSEEK_API_KEY=sk-..." >> ~/.hermes/.env
+
 # Dans votre config.yaml
 hermes config set model.default deepseek-chat
 hermes config set model.provider deepseek
-hermes config set DEEPSEEK_API_KEY "sk-votre-cle-ique"
 ```
 
 Ou éditez `config.yaml` manuellement :
@@ -38,15 +40,19 @@ Ou éditez `config.yaml` manuellement :
 model:
   default: deepseek-chat
   provider: deepseek
-providers:
-  deepseek:
-    api_key: "sk-votre-cle-ique"
+```
+
+La clé API se trouve dans `.env` (pas dans `config.yaml`) :
+
+```bash
+# ~/.hermes/.env
+DEEPSEEK_API_KEY=sk-...
 ```
 
 ### 3. Vérifier
 
 ```bash
-hermes run -m "Quel est mon solde DeepSeek ?"
+hermes chat -q "Quel est mon solde DeepSeek ?"
 ```
 
 ## Ollama (provider local, gratuit)
@@ -75,13 +81,21 @@ ollama pull mistral:7b     # Mistral
 
 ### 3. Configurer Hermes
 
+```bash
+# Configurer via CLI
+hermes config set model.default qwen2.5:7b
+hermes config set model.provider ollama
+hermes config set model.base_url "http://localhost:11434/v1"
+```
+
+Ou dans `config.yaml` :
+
 ```yaml
-# Dans config.yaml
-providers:
-  custom:
-    ollama:
-      base_url: "http://localhost:11434/v1"
-      api_key: "ollama"  # Valeur arbitraire, non utilisée
+model:
+  default: qwen2.5:7b
+  provider: ollama
+  base_url: "http://localhost:11434/v1"
+  api_key: "ollama"  # Valeur arbitraire, non utilisée
 ```
 
 ### 4. Vérifier
@@ -143,11 +157,14 @@ OPENAI_API_KEY="sk-..."  # Si vous utilisez OpenAI
 model:
   default: deepseek-chat
   provider: deepseek
+  base_url: ""  # URL par défaut du provider
+  api_key: "${DEEPSEEK_API_KEY}"  # Référence variable d'environnement
+
+# Provider fallback (Gemini)
 providers:
-  custom:
-    ollama:
-      base_url: "http://localhost:11434/v1"
-      api_key: "ollama"
+  google:
+    api_key: "${GEMINI_API_KEY}"
+
 fallback_providers:
   - provider: google
     model: gemini-2.0-flash-001

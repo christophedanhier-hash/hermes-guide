@@ -2,7 +2,7 @@
 
 ## Installation
 
-### `pip install` échoue
+### `pip install` échoue (installation manuelle)
 
 ```
 ERROR: Could not find a version that satisfies the requirement...
@@ -13,7 +13,12 @@ ERROR: Could not find a version that satisfies the requirement...
 - Venv non activé
 - Pip obsolète
 
-**Solutions :**
+**Note :** La méthode recommandée est le script d'installation officiel :
+```bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+```
+
+**Solutions (installation manuelle) :**
 ```bash
 # Vérifier la version Python
 python3 --version  # Doit être 3.11+
@@ -49,7 +54,7 @@ pip install -e .
 Si votre assistant perd sa session (contexte précédent), c'est normal :
 - Chaque nouvelle conversation est une session fraîche
 - Les informations durables doivent être stockées dans les **skills** ou la **mémoire**
-- Utilisez `hermes session list` pour voir les sessions récentes
+- Utilisez `hermes sessions list` ou `hermes sessions browse` pour voir les sessions récentes
 
 ## Crons
 

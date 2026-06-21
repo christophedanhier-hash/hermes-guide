@@ -2,15 +2,29 @@
 
 ## Profils
 
-Un **profil** est l'identité de votre assistant. Il définit quel LLM utiliser, quels outils sont disponibles, et comment il se comporte.
+Un **profil** est une instance isolée d'Hermes avec sa propre configuration, ses propres clés API, sa mémoire et ses sessions. Chaque profil devient aussi une commande séparée.
 
-```yaml
-# Exemple : default
-profiles:
-  default:
-    model: deepseek-chat
-    provider: deepseek
-    gateway: telegram
+```bash
+# Créer un profil → crée aussi l'alias "mon-profil"
+hermes profile create mon-profil
+
+# Utiliser le profil
+mon-profil chat           # alias complet
+hermes -p mon-profil chat # flag explicite
+```
+
+Structure d'un profil dans `~/.hermes/profiles/<nom>/` :
+
+```
+~/.hermes/profiles/mon-profil/
+├── config.yaml     # Modèle, provider, outils
+├── .env            # Clés API, tokens
+├── SOUL.md         # Personnalité
+├── memories/       # Mémoire persistante
+├── skills/         # Skills dédiés
+├── sessions/       # Sessions du profil
+├── cron/           # Tâches planifiées
+└── logs/           # Logs
 ```
 
 ### Règle LEO : un seul profil
@@ -23,14 +37,48 @@ La tentation est grande de créer un profil par usage (un pour les conversations
 - **plusieurs providers** au sein du même profil (DeepSeek + Ollama + Gemini)
 - **Zéro bascule de profil** — la fiabilité avant tout
 
+| Propriété | Configuration | Description |
+|-----------|--------------|-------------|
+| **Modèle** | `model.default` | LLM principal (ex: `deepseek-chat`) |
+| **Provider** | `model.provider` | Fournisseur (ex: `deepseek`, `openrouter`) |
+| **Gateway** | `gateways.telegram.bot_token` | Token du bot Telegram |
+| **Outils** | `hermes tools` | Toolsets activés par plateforme |
+| **Skills** | `hermes skills install <id>` | Procédures chargées automatiquement |
+
 ### Commandes profils
 
 ```bash
 # Lister les profils
 hermes profile list
 
-# Utiliser un profil
-hermes profile use default
+# Créer un profil (vide)
+hermes profile create mon-profil
+
+# Créer avec clonage de la config actuelle
+hermes profile create mon-profil --clone
+
+# Créer en clonant depuis un autre profil
+hermes profile create mon-profil --clone-from default
+
+# Utiliser un profil par défaut
+hermes profile use mon-profil
+
+# Voir les détails
+hermes profile show mon-profil
+
+# Supprimer
+hermes profile delete mon-profil
+
+# Renommer
+hermes profile rename ancien nouveau
+
+# Exporter / Importer (tar.gz)
+hermes profile export mon-profil
+hermes profile import archive.tar.gz
+
+# Lancer avec un profil spécifique
+hermes -p mon-profil chat
+hermes -p mon-profil chat -q "Bonjour"
 ```
 
 ## Gateways
@@ -72,7 +120,8 @@ gateways:
 
 ```bash
 # Mode terminal interactif (aucune configuration)
-hermes run
+hermes
+# ou : hermes chat
 ```
 
 ## Skills
