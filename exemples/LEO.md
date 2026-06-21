@@ -52,6 +52,17 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 
 **>95% des crons sont en no_agent ou Ollama local** (zéro DeepSeek consommé par les tâches planifiées).
 
+### Workflows n8n (redondance)
+
+Depuis juin 2026, certains crons critiques sont **doublés dans n8n** pour bénéficier du retry natif :
+
+| Workflow n8n | Horaire | Rôle | Redondance |
+|-------------|---------|------|------------|
+| `💰 Budget Check` | H:05 | Appel DeepSeek API → webhook → budget.json | ⚡ Retry 3x + backup Hermes |
+| `🛡️ Dashboard Watch v2` | 30min | Ping 6 dashboards HTTP | ⚡ Retry 3x + backup Hermes (2h) |
+
+**Pattern :** n8n = exécution garantie (retry) / Hermes = backup si n8n down. Double filet.
+
 ### Dashboards (6)
 
 | Dashboard | Technologie | Màj | Lien |
