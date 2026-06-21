@@ -119,6 +119,19 @@ if tok:
     subprocess.run(["git", "remote", "set-url", "origin", remote])
 ```
 
+### 🔴 Les repos locaux doivent être synchronisés
+
+`dashboard-watch` vérifie l'âge du dernier commit **dans le repo local** pour déterminer si un dashboard est stale. Si votre script de déploiement push vers un clone temporaire (`/tmp/...`), le repo local ne sera jamais mis à jour et `dashboard-watch` déclenchera un redeploiement à chaque cycle.
+
+**Solution :** après avoir pushé depuis `/tmp/`, faites un `git pull` dans le repo local :
+
+```bash
+cd /opt/data/n8n-dashboard
+git pull origin main
+```
+
+> 🐛 **Bug #16** — Cette cause racine a été corrigée sur le dashboard n8n (juin 2026).
+
 ### 🔴 Budget désynchronisé
 
 Si le budget affiché sur un dashboard ne correspond pas au `budget.json`, le cron `dashboard-watch` (voir `crons.md`) déclenche une alerte. Vérifiez que les clés lues par le script de déploiement correspondent exactement à celles du JSON :
