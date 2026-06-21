@@ -178,4 +178,5 @@ subprocess.run(["gh", "api", f"repos/user/{repo}/pages/builds", "-X", "POST"])
 ## Pour aller plus loin
 
 - Voir `03-utilisation/crons.md` pour le déploiement automatisé
+- Voir `03-utilisation/architecture-leo.md` pour la vue complète (schéma Mermaid, interactions, filets)
 - Voir `exemples/LEO.md` pour les dashboards en production
