@@ -152,6 +152,25 @@ Un cron `dashboard-watch` (toutes les 2h) vérifie que tous les dashboards sont 
 
 Le script est dans `scripts/dashboard-watch.py` et son état est sauvegardé dans `metrics/dashboard-watch-state.json`.
 
+### 🛡️ Auto-Heal — cicatrisation automatique (cron agent, H:45)
+
+Depuis le 21/06/2026, un cron **agent-driven** (pas no_agent) tourne toutes les heures à H:45 pour détecter et corriger automatiquement les problèmes connus :
+
+- **Crons en erreur** → détection via `cronjob list`, diagnostic (PATH `gh`, script cassé, import manquant) et correction auto + execution forcée
+- **Dashboard HTTP non-200** → redéploiement immédiat
+- **budget-webhook down** → redémarrage automatique
+- **Disque plein** → alerte
+
+**Patterns auto-réparables :**
+| Pattern | Détection | Correction |
+|---------|-----------|------------|
+| `gh` introuvable | Stderr "gh: command not found" | Patch avec chemin absolu `/opt/data/home/.local/bin/gh` |
+| Dashboard 404 | HTTP != 200 | Relance le script de déploiement |
+| budget-webhook down | Process manquant | Relance via watchdog |
+| Import Python cassé | Traceback d'import | pip install dans le venv |
+
+**Rapport :** envoyé sur Telegram UNIQUEMENT si des problèmes détectés. Silence = tout va bien.
+
 ## Pièges à éviter
 
 ### 🔴 Ne pas mettre de LLM sur une tâche purement script
