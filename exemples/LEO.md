@@ -26,33 +26,48 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 
 ## Tâches quotidiennes
 
-### Crons (8 actifs, 0$ LLM)
+### Crons (22 actifs, 0$ LLM)
 
 | Cron | Horaire | Type | Coût | Description |
 |------|---------|------|------|-------------|
 | `machines-kpi` | **H:00** | 🔧 Script | **0$** | Collecte CPU/RAM/disque 3 machines |
 | `budget-check-v6` | **H:05** | 🔧 Script | **0$** | Relevé solde DeepSeek + projection |
-| `dashboard-deploy` | **H:10** | 🔧 Script | **0$** | Génération et push dashboard Hermes KPI |
-| `leo-metrics` | **H:15** | 🔧 Script | **0$** | Génération et push dashboard 3 machines |
+| `dashboard-leo` | **H:10** | 🔧 Script | **0$** | Dashboard KPI LEO (sessions, budget) |
+| `leo-metrics` | **H:15** | 🔧 Script | **0$** | Dashboard 3 machines |
 | `crons-dashboard` | **H:20** | 🔧 Script | **0$** | Monitoring de tous les crons |
 | `github-dashboard` | **H:25** | 🔧 Script | **0$** | Activité GitHub (repos Hermes vs Dev) |
 | `wiki-sync` | **H:30** | 🔧 Script | **0$** | Synchronisation sources → Wiki MkDocs |
-| `daily-backup` | 06:00 | 🔧 Script | **0$** | Backup fichiers critiques vers Google Drive |
-| `drive-sync` | 18:00 | 🔧 Script | **0$** | Sync Drive ↔ GitHub (bidirectionnel complet) |
-| `docs-update` | Lun 08:00 | 🧠 Ollama | **0$** 🏠 | Mise à jour docs techniques du T600 |
+| `bavi-leo-dashboard` | H:05 | 🔧 Script | **0$** | Dashboard KPIs BAVI LEO |
+| `dashboard-n8n` | */15 | 🔧 Script | **0$** | Dashboard monitoring n8n |
+| `n8n-healthcheck` | */15 | 🔧 Script | **0$** | Ping n8n API |
+| `dashboard-watch` | 30 */2 | 🔧 Script | **0$** | Surveillance dashboards + budget ✅ |
+| `daily-backup` | 06:00 | 🔧 Script | **0$** | Backup fichiers critiques |
+| `drive-sync` | 18:00 | 🔧 Script | **0$** | Sync Drive ↔ GitHub |
+| `credentials-check` | Lun 09:00 | 🔧 Script | **0$** | Vérification tokens OAuth |
+| `doc-watch-auto` | 00/06/12/18 | 🔧 Script | **0$** | Surveillance docs 5 wikis |
+| `Classifieur emails` | 30m | 🧠 Ollama | **0$** 🏠 | Classification Gmail |
+| Veille IA (phase 1) | 07:30 | 🔧 Script | **0$** | Collecte RSS 11 sources |
+| Veille IA (phase 2) | 08:00 | 🤖 DeepSeek | ~0.05$ | Analyse + email Cowork |
+| `check-hermes-update` | 09:00 | 🔧 Script | **0$** | Vérification nouvelle version Hermes |
 
-**100% des crons sont en no_agent ou Ollama local** (zéro DeepSeek consommé par les tâches planifiées).
+**>95% des crons sont en no_agent ou Ollama local** (zéro DeepSeek consommé par les tâches planifiées).
 
 ### Dashboards (6)
 
 | Dashboard | Technologie | Màj | Lien |
 |-----------|-------------|-----|------|
-| Hermes KPI (budget DeepSeek) | HTML + Chart.js | H:10 | [dashboard-leo](https://christophedanhier-hash.github.io/dashboard-leo/) |
+| LEO KPI (budget DeepSeek, sessions) | HTML + Chart.js | H:10 | [dashboard-leo](https://christophedanhier-hash.github.io/dashboard-leo/) |
+| BAVI LEO (KPIs session BAVI) | HTML + Chart.js | H:05 | [bavi-leo-dashboard](https://christophedanhier-hash.github.io/bavi-leo-dashboard/) |
 | 3 Machines (CPU/RAM/disque) | HTML + CSS | H:15 | [leo-metrics](https://christophedanhier-hash.github.io/leo-metrics/) |
-| Crons LEO (monitoring 8 crons) | HTML + CSS pur | H:20 | [crons-dashboard](https://christophedanhier-hash.github.io/crons-dashboard/) |
-| Suivi Budget APIs Léo | Google Sheets | H:00/H:05 | Drive LEO |
-| Suivi Machines LEO | Google Sheets | H:00 | Drive LEO |
-| Dashboard Guide Hermes | Google Docs | Manuel | Drive LEO → GitHub |
+| Crons (22 crons, historique 7j) | HTML + CSS pur | H:20 | [crons-dashboard](https://christophedanhier-hash.github.io/crons-dashboard/) |
+| GitHub (22 repos) | HTML + CSS | H:25 | [github-dashboard](https://christophedanhier-hash.github.io/github-dashboard/) |
+| n8n (workflows, exécutions) | HTML + CSS | */15 | [dashboard-n8n](https://christophedanhier-hash.github.io/dashboard-n8n/) |
+
+Tous les scripts de déploiement incluent :
+- `--allow-empty` + `run_id` dans le footer pour éviter "nothing to commit"
+- Force-push fallback si le push est rejeté
+- **Rebuild GH Pages API** après push (CDN forcé)
+- Validation des clés `budget.json` au déploiement
 
 ## Règles de fonctionnement
 

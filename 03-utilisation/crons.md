@@ -141,6 +141,17 @@ cat ~/.hermes/cron/output/<id>/*.md
 en un coup d'œil. Ce dashboard peut lui-même être mis à jour par un cron
 horaire.
 
+### 🔍 dashboard-watch — surveillance automatique
+
+Un cron `dashboard-watch` (toutes les 2h) vérifie que tous les dashboards sont à jour :
+
+- **HTTP 200** — chaque dashboard répond
+- **Âge < 2h** — données fraîches
+- **Budget cohérent** — valeur affichée du budget ≈ `budget.json` (écart max 1$)
+- **Redeploiement auto** — si stale ou 404, le script relance le déploiement
+
+Le script est dans `scripts/dashboard-watch.py` et son état est sauvegardé dans `metrics/dashboard-watch-state.json`.
+
 ## Pièges à éviter
 
 ### 🔴 Ne pas mettre de LLM sur une tâche purement script

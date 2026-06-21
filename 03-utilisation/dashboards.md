@@ -16,14 +16,16 @@ Script de collecte → JSON + HTML → Push GitHub Pages
 
 ## Les dashboards de LEO
 
-LEO a **5 dashboards** en production, tous rafraîchis toutes les heures :
+LEO a **6 dashboards** en production, tous rafraîchis toutes les heures :
 
 | Dashboard | Contenu | URL | Cron |
 |-----------|---------|-----|------|
-| **Hermes KPI** | Budget DeepSeek, sessions, coûts | [dashboard-leo](https://christophedanhier-hash.github.io/dashboard-leo/) | H:10 |
+| **LEO KPI** | Budget DeepSeek, sessions, coûts | [dashboard-leo](https://christophedanhier-hash.github.io/dashboard-leo/) | H:10 |
+| **BAVI LEO** | KPIs BAVI (sessions, tokens, budget) | [bavi-leo-dashboard](https://christophedanhier-hash.github.io/bavi-leo-dashboard/) | H:05 |
 | **3 Machines** | CPU, RAM, disque LEO/Yoga/Penguin | [leo-metrics](https://christophedanhier-hash.github.io/leo-metrics/) | H:15 |
 | **Crons LEO** | État de tous les crons, historique 7j | [crons-dashboard](https://christophedanhier-hash.github.io/crons-dashboard/) | H:20 |
-| **Backup** | Dernier backup, fichiers préservés | Google Drive | 06:00 |
+| **GitHub** | Activité repos Hermes vs Développement | [github-dashboard](https://christophedanhier-hash.github.io/github-dashboard/) | H:25 |
+| **n8n** | Monitoring workflows n8n | [dashboard-n8n](https://christophedanhier-hash.github.io/dashboard-n8n/) | */15 |
 | **Drive Sync** | Dernière sync Drive ↔ GitHub bidirectionnelle | GitHub | 18:00 |
 
 Tous sont générés par des scripts `no_agent` — **0$ de coût LLM** par mise à jour.
@@ -115,6 +117,30 @@ tok = os.environ.get("GH_TOKEN")
 if tok:
     remote = f"https://user:{tok}@github.com/user/repo.git"
     subprocess.run(["git", "remote", "set-url", "origin", remote])
+```
+
+### 🔴 Budget désynchronisé
+
+Si le budget affiché sur un dashboard ne correspond pas au `budget.json`, le cron `dashboard-watch` (voir `crons.md`) déclenche une alerte. Vérifiez que les clés lues par le script de déploiement correspondent exactement à celles du JSON :
+
+```python
+# Dans budget.json : "avg_daily", "total_spent" (pas "daily_spend")
+# Dans le script : budget.get("avg_daily", 0)  # ✅ correct
+```
+
+## Surveillance automatique (dashboard-watch)
+
+Un cron **dashboard-watch** (`scripts/dashboard-watch.py`) tourne toutes les 2h et vérifie :
+
+1. **HTTP 200** — chaque dashboard répond
+2. **Âge < 2h** — données fraîches
+3. **Budget cohérent** — valeur affichée ≈ `budget.json` (écart max 1$)
+4. **Redeploiement auto** — si stale ou 404, le script relance le déploiement
+5. **Rebuild GH Pages** — après chaque push, appelle l'API pour forcer le rafraîchissement CDN
+
+```python
+# Extrait : rebuild GH Pages après push
+subprocess.run(["gh", "api", f"repos/user/{repo}/pages/builds", "-X", "POST"])
 ```
 
 ## Idées de dashboards
