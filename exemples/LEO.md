@@ -26,7 +26,7 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 
 ## Tâches quotidiennes
 
-### Crons (22 actifs, 0$ LLM)
+### Crons (23 actifs, 0$ LLM)
 
 | Cron | Horaire | Type | Coût | Description |
 |------|---------|------|------|-------------|
