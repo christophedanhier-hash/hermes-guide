@@ -117,7 +117,7 @@ Chaque dashboard est un **HTML statique** hébergé sur GitHub Pages, généré 
 
 ---
 
-## 3. Les Crons Hermes (24)
+## 3. Les Crons Hermes (25)
 
 Tous en `no_agent` sauf 2 = **quasi 0$ de consommation LLM**.
 
@@ -166,6 +166,7 @@ Tous en `no_agent` sauf 2 = **quasi 0$ de consommation LLM**.
 | `credentials-check` | **Lun 09:00** | `check-credentials.py` | Vérification tokens OAuth |
 | `check-hermes-update` | **09:00** | `check_hermes_update.py` | Nouvelle version Hermes ? |
 | `doc-watch-auto` | **00/06/12/18** | `doc-watch-auto.py` | Snapshot docs → patch auto → commit |
+| `auto-commit-repos` | **30 */2h** | `auto-commit-repos.sh` | Auto-commit fichiers modifiés dans 5 repos (no_agent) |
 
 ### GitHub (1)
 
@@ -317,7 +318,7 @@ flowchart TB
 
 | Métrique | Valeur |
 |----------|--------|
-| Crons Hermes | **24** (dont 22 en no_agent = quasi 0$) |
+| Crons Hermes | **25** (dont 22 en no_agent = quasi 0$) |
 | Workflows n8n | **2** ✅ |
 | Dashboards | **7** (tous HTTP 200) |
 | Budget DeepSeek | **26.24$** |
