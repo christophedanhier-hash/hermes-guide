@@ -169,7 +169,8 @@ Depuis le 21/06/2026, un cron **agent-driven** (pas no_agent) tourne toutes les 
 | budget-webhook down | Process manquant | Relance via watchdog |
 | Import Python cassé | Traceback d'import | pip install dans le venv |
 
-**Rapport :** envoyé sur Telegram UNIQUEMENT si des problèmes détectés. Silence = tout va bien.
+**Rapport :** livré en local (plus sur Telegram). Consultez le **🌍 Global Dashboard** à
+https://christophedanhier-hash.github.io/leo-global-dashboard/ pour tout voir en un coup d'œil.
 
 ## Pièges à éviter
 

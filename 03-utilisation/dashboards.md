@@ -16,7 +16,7 @@ Script de collecte → JSON + HTML → Push GitHub Pages
 
 ## Les dashboards de LEO
 
-LEO a **6 dashboards** en production, tous rafraîchis toutes les heures :
+LEO a **7 dashboards** en production, tous rafraîchis par des crons no_agent :
 
 | Dashboard | Contenu | URL | Cron |
 |-----------|---------|-----|------|
@@ -26,7 +26,7 @@ LEO a **6 dashboards** en production, tous rafraîchis toutes les heures :
 | **Crons LEO** | État de tous les crons, historique 7j | [crons-dashboard](https://christophedanhier-hash.github.io/crons-dashboard/) | H:20 |
 | **GitHub** | Activité repos Hermes vs Développement | [github-dashboard](https://christophedanhier-hash.github.io/github-dashboard/) | H:25 |
 | **n8n** | Monitoring workflows n8n | [dashboard-n8n](https://christophedanhier-hash.github.io/dashboard-n8n/) | */15 |
-| **Drive Sync** | Dernière sync Drive ↔ GitHub bidirectionnelle | GitHub | 18:00 |
+| **Global LEO** | Vue consolidée : crons, dashboards, budget, n8n, machines | [leo-global-dashboard](https://christophedanhier-hash.github.io/leo-global-dashboard/) | H:05 |
 
 Tous sont générés par des scripts `no_agent` — **0$ de coût LLM** par mise à jour.
 
@@ -168,7 +168,28 @@ Un cron **dashboard-watch** (`scripts/dashboard-watch.py`) tourne toutes les 2h 
 subprocess.run(["gh", "api", f"repos/user/{repo}/pages/builds", "-X", "POST"])
 ```
 
-## Idées de dashboards
+## 🦁 Global Dashboard LEO (portail unique)
+
+Depuis le 22/06/2026, LEO a un **portail unique** qui consolide tout en une seule page :
+- 🔵 **Crons (24)** — statut, historique, erreurs
+- 📊 **Dashboards (7)** — HTTP, âge, budget
+- 💰 **Budget DeepSeek** — solde, jours restants
+- 🩺 **n8n** — online/offline
+- 🏛️ **BAVI LEO** — sessions, messages, tokens
+- 🖥️ **Machines (3)** — statut en ligne/hors ligne
+- 🚨 **Alertes** — dernières anomalies détectées
+- 🔗 **Liens rapides** — accès aux 7 dashboards détaillés
+
+**Avantages :**
+- ✅ **Plus aucun rapport Telegram** — dashboard-watch et Auto-Heal livrent en local
+- ✅ **Un seul bookmark** au lieu de 7
+- ✅ **Cron no_agent toutes les 10min** (H:05) — 0$ de coût
+- ✅ **Auto-déploiement GH Pages**
+
+```bash
+# Le cron
+🌍 Global Dashboard — H:05 → /opt/data/scripts/deploy_leo_global.py (no_agent)
+```
 
 - **Usage LLM** — requêtes/jour, tokens consommés, coût estimé
 - **Système** — CPU, RAM, disque, uptime de votre serveur

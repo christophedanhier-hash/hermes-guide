@@ -26,10 +26,11 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 
 ## Tâches quotidiennes
 
-### Crons (24 actifs, 0$ LLM)
+### Crons (25 actifs, 0$ LLM)
 
 | Cron | Horaire | Type | Coût | Description |
 |------|---------|------|------|-------------|
+| `🌍 Global Dashboard` | **H:05** | 🔧 Script | **0$** | Portail unique monitoring consolidé |
 | `machines-kpi` | **H:00** | 🔧 Script | **0$** | Collecte CPU/RAM/disque 3 machines |
 | `budget-check-v6` | **H:05** | 🔧 Script | **0$** | Relevé solde DeepSeek + projection |
 | `dashboard-leo` | **H:10** | 🔧 Script | **0$** | Dashboard KPI LEO (sessions, budget) |
@@ -64,10 +65,11 @@ Depuis juin 2026, certains crons critiques sont **doublés dans n8n** pour bén�
 
 **Pattern :** n8n = exécution garantie (retry) / Hermes = backup si n8n down. Double filet.
 
-### Dashboards (6)
+### Dashboards (7)
 
 | Dashboard | Technologie | Màj | Lien |
 |-----------|-------------|-----|------|
+| 🌍 Global LEO | HTML + CSS | H:05 | [leo-global-dashboard](https://christophedanhier-hash.github.io/leo-global-dashboard/) |
 | LEO KPI (budget DeepSeek, sessions) | HTML + Chart.js | H:10 | [dashboard-leo](https://christophedanhier-hash.github.io/dashboard-leo/) |
 | BAVI LEO (KPIs session BAVI) | HTML + Chart.js | H:05 | [bavi-leo-dashboard](https://christophedanhier-hash.github.io/bavi-leo-dashboard/) |
 | 3 Machines (CPU/RAM/disque) | HTML + CSS | H:15 | [leo-metrics](https://christophedanhier-hash.github.io/leo-metrics/) |
