@@ -26,7 +26,7 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 
 ## Tâches quotidiennes
 
-### Crons (25 actifs, 0$ LLM)
+### Crons (26 actifs, 0$ LLM)
 
 | Cron | Horaire | Type | Coût | Description |
 |------|---------|------|------|-------------|
@@ -51,6 +51,8 @@ LEO communique uniquement par **Telegram** (pas d'autre canal). L'email est util
 | Veille IA (phase 2) | 08:00 | 🤖 DeepSeek | ~0.05$ | Analyse + email Cowork |
 | `check-hermes-update` | 09:00 | 🔧 Script | **0$** | Vérification nouvelle version Hermes |
 | `🛡️ Auto-Heal` | **H:45** | 🧠 Agent | **0$** | Détection + correction auto des erreurs |
+| `watchdog-code-server` | **\*/5** | 🔧 Script | **0$** | Relance code-server si arrêté |
+| `watchdog-code-server-tunnel` | **\*/5** | 🔧 Script | **0$** | Maintient le tunnel SSH code-server |
 
 **>95% des crons sont en no_agent ou Ollama local** (zéro DeepSeek consommé par les tâches planifiées).
 

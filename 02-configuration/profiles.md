@@ -39,7 +39,7 @@ La tentation est grande de créer un profil par usage (un pour les conversations
 
 | Propriété | Configuration | Description |
 |-----------|--------------|-------------|
-| **Modèle** | `model.default` | LLM principal (ex: `deepseek-chat`) |
+| **Modèle** | `model.default` | LLM principal (ex: `deepseek-v4-flash`) |
 | **Provider** | `model.provider` | Fournisseur (ex: `deepseek`, `openrouter`) |
 | **Gateway** | `gateways.telegram.bot_token` | Token du bot Telegram |
 | **Outils** | `hermes tools` | Toolsets activés par plateforme |

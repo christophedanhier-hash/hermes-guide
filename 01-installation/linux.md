@@ -63,7 +63,7 @@ Le wizard de configuration vous guidera pour :
 echo "DEEPSEEK_API_KEY=votre_clé_ici" >> ~/.hermes/.env
 
 # Configurer le provider DeepSeek
-hermes config set model.default deepseek-chat
+hermes config set model.default deepseek-v4-flash
 hermes config set model.provider deepseek
 ```
 

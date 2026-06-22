@@ -30,7 +30,7 @@ DeepSeek offre un excellent rapport qualité/prix avec son API.
 echo "DEEPSEEK_API_KEY=sk-..." >> ~/.hermes/.env
 
 # Dans votre config.yaml
-hermes config set model.default deepseek-chat
+hermes config set model.default deepseek-v4-flash
 hermes config set model.provider deepseek
 ```
 
@@ -38,7 +38,7 @@ Ou éditez `config.yaml` manuellement :
 
 ```yaml
 model:
-  default: deepseek-chat
+  default: deepseek-v4-flash
   provider: deepseek
 ```
 
@@ -119,7 +119,7 @@ Gemini peut servir de provider de secours si le principal est indisponible.
 # Dans config.yaml — comme fallback
 fallback_providers:
   - provider: google
-    model: gemini-2.0-flash-001
+    model: gemini-2.5-flash
 ```
 
 Stockez la clé dans `.env` :
@@ -155,7 +155,7 @@ OPENAI_API_KEY="sk-..."  # Si vous utilisez OpenAI
 
 ```yaml
 model:
-  default: deepseek-chat
+  default: deepseek-v4-flash
   provider: deepseek
   base_url: ""  # URL par défaut du provider
   api_key: "${DEEPSEEK_API_KEY}"  # Référence variable d'environnement
@@ -167,7 +167,7 @@ providers:
 
 fallback_providers:
   - provider: google
-    model: gemini-2.0-flash-001
+    model: gemini-2.5-flash
 ```
 
 Ce n'est pas grave si votre fichier `config.yaml` est plus ou moins complexe. L'important est qu'il fonctionne pour **vous**.
